@@ -37,44 +37,52 @@ async def whistler_weather() -> str:
         
         # Extract the current weather summary information
         soup = BeautifulSoup(html_content, 'html.parser')
-        weather_summary = soup.select_one(".container.component_container p")
-        
-        weather_data = {
-            "current_conditions": {}
-        }
-        
-        if weather_summary:
-            weather_text = weather_summary.get_text(strip=True)
-            weather_data["current_conditions"]["summary"] = weather_text
-            
-            # Extract temperature, wind and freezing level
-            temp_match = re.search(r'Alpine Temperature: High (-?\d+) °C', weather_text)
-            if temp_match:
-                weather_data["current_conditions"]["temperature_high"] = f"{temp_match.group(1)}°C"
-                
-            wind_match = re.search(r'Wind (.*?)\.', weather_text)
-            if wind_match:
-                weather_data["current_conditions"]["wind"] = wind_match.group(1)
-                
-            freezing_match = re.search(r'Freezing Level: (\d+) metres', weather_text)
-            if freezing_match:
-                weather_data["current_conditions"]["freezing_level"] = f"{freezing_match.group(1)} metres"
-        
-        # Look for forecast data in the next paragraph
-        forecast_element = soup.select_one(".container.component_container p span[data-teams='true']")
-        if forecast_element:
-            weather_data["forecast"] = forecast_element.get_text(strip=True)
-            
+        weather_data  = {}
+
         # Extract FR.forecasts JSON data from script tags
         script_tags = soup.find_all('script')
         for script in script_tags:
             if script.string and 'FR.forecasts' in script.string:
-                forecasts_match = re.search(r'FR\.forecasts\s*=\s*(\{.+?\});', script.string, re.DOTALL)
+                forecasts_match = re.search(r'FR\.forecasts\s*=\s*(\[.*?\]);', script.string, re.DOTALL)
                 if forecasts_match:
                     try:
                         # Parse the JSON blob directly
-                        forecasts_json = json.loads(forecasts_match.group(1))
-                        weather_data["detailed_forecasts"] = forecasts_json
+                        weather_json = forecasts_match.group(1)
+                        forecasts_json = json.loads(weather_json)
+                        # Extract metric data from the forecasts JSON
+                        metric_forecasts = []
+                        for forecast in forecasts_json:
+                            metric_forecast = {
+                                "CurrentTempMetric": forecast.get("CurrentTempMetric"),
+                                "HighTempMetric": forecast.get("HighTempMetric"),
+                                "LowTempMetric": forecast.get("LowTempMetric"),
+                                "WindSpeed": forecast.get("WindSpeed"),
+                                "FreezingLevelMetric": forecast.get("FreezingLevelMetric"),
+                                "SnowFallDayMetric": forecast.get("SnowFallDayMetric"),
+                                "SnowFallNightMetric": forecast.get("SnowFallNightMetric"),
+                                "Date": forecast.get("Date"),
+                                "WeatherShortDescription": forecast.get("WeatherShortDescription"),
+                            }
+                            if "ForecastData" in forecast:
+                                metric_forecast["ForecastData"] = [
+                                    {
+                                        "HighTempMetric": day.get("HighTempMetric"),
+                                        "LowTempMetric": day.get("LowTempMetric"),
+                                        "WindSpeed": day.get("WindSpeed"),
+                                        "FreezingLevelMetric": day.get("FreezingLevelMetric"),
+                                        "SnowFallDayMetric": day.get("SnowFallDayMetric"),
+                                        "SnowFallNightMetric": day.get("SnowFallNightMetric"),
+                                        "Date": day.get("Date"),
+                                        "WeatherShortDescription": day.get("WeatherShortDescription"),
+                                    }
+                                    for day in forecast["ForecastData"]
+                                ]
+                            metric_forecasts.append(metric_forecast)
+                        
+                        # Assign the first and second elements to alpineForecast and villageForecast
+                        weather_data["alpineForecast"] = metric_forecasts[0] if len(metric_forecasts) > 0 else None
+                        weather_data["villageForecast"] = metric_forecasts[1] if len(metric_forecasts) > 1 else None
+                        
                     except json.JSONDecodeError:
                         weather_data["forecast_parse_error"] = "Could not parse forecast JSON data"
                         break  # Exit loop if parsing fails

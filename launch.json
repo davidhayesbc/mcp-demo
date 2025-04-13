@@ -1,0 +1,19 @@
+{
+  "configurations": [
+    {
+      "type": "debugpy",
+      "request": "launch",
+      "name": "Debug Pytest Test",
+      "program": "${workspaceFolder}/${input:testFile}",
+      "args": ["-v"],
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "testFile",
+      "description": "Enter the path to the test file you want to debug (e.g., test_main.py)"
+    }
+  ]
+}
