@@ -1,9 +1,17 @@
+import logging
 from typing import Any
 import httpx
 from mcp.server.fastmcp import FastMCP
 import re
 import json
 from bs4 import BeautifulSoup
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.StreamHandler()]
+)
 
 mcp = FastMCP("Whistler Weather)")
 
@@ -15,29 +23,32 @@ async def fetch_weather_data(url: str) -> str:
         "User-Agent": USER_AGENT,
     }
     try:
+        logging.info(f"Fetching weather data from URL: {url}")
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=headers)
             response.raise_for_status()
+            logging.info(f"Successfully fetched weather data from URL: {url}")
             return response.text
     except httpx.HTTPStatusError as e:
-        print(f"HTTP error occurred: {e}")
+        logging.error(f"HTTP error occurred: {e}")
         raise
     except httpx.RequestError as e:
-        print(f"Request error occurred: {e}")
+        logging.error(f"Request error occurred: {e}")
         raise
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logging.error(f"An unexpected error occurred: {e}")
         raise
 
-@mcp.tool("whistler_weather", "Fetches the latest weather data from Whistler Blackcomb")
-async def whistler_weather() -> str:
-    """Fetches the latest weather data from Whistler Blackcomb"""
+@mcp.resource("data://weather")
+async def whistler_weather() -> dict:
+    """Returns weather data for Whistler Blackcomb."""
     try:
+        logging.info("Starting to fetch and parse weather data for Whistler.")
         html_content = await fetch_weather_data(WHISTLER_WEATHER_API_URL)
         
         # Extract the current weather summary information
         soup = BeautifulSoup(html_content, 'html.parser')
-        weather_data  = {}
+        weather_data = {}
 
         # Extract FR.forecasts JSON data from script tags
         script_tags = soup.find_all('script')
@@ -46,6 +57,7 @@ async def whistler_weather() -> str:
                 forecasts_match = re.search(r'FR\.forecasts\s*=\s*(\[.*?\]);', script.string, re.DOTALL)
                 if forecasts_match:
                     try:
+                        logging.info("Parsing forecast JSON data.")
                         # Parse the JSON blob directly
                         weather_json = forecasts_match.group(1)
                         forecasts_json = json.loads(weather_json)
@@ -82,11 +94,24 @@ async def whistler_weather() -> str:
                         # Assign the first and second elements to alpineForecast and villageForecast
                         weather_data["alpineForecast"] = metric_forecasts[0] if len(metric_forecasts) > 0 else None
                         weather_data["villageForecast"] = metric_forecasts[1] if len(metric_forecasts) > 1 else None
+                        logging.info("Successfully parsed weather data.")
                         
                     except json.JSONDecodeError:
+                        logging.error("Could not parse forecast JSON data.")
                         weather_data["forecast_parse_error"] = "Could not parse forecast JSON data"
                         break  # Exit loop if parsing fails
         
-        return f"Weather data fetched successfully: {json.dumps(weather_data, indent=2)}"
+        return weather_data  # Return the dictionary directly
     except Exception as e:
-        return f"Failed to fetch weather data: {str(e)}"
+        logging.error(f"Failed to fetch weather data: {str(e)}")
+        return {"error": f"Failed to fetch weather data: {str(e)}"}
+    
+@mcp.resource("config://app-version")
+def get_app_version() -> str:
+    """Returns the application version."""
+    return "v0.0.1"
+
+@mcp.resource("data://product-categories")
+def get_categories() -> list[str]:
+    """Returns a list of available product categories."""
+    return ["Electronics", "Books", "Home Goods"]

@@ -12,10 +12,7 @@ async def test_whistler_weather(monkeypatch):
     monkeypatch.setattr("main.fetch_weather_data", mock_fetch_weather_data)
 
     # Call the whistler_weather function
-    result = await whistler_weather()
-
-    # Parse the JSON from the result
-    result_data = json.loads(result.split(":", 1)[1].strip())
+    result_data = await whistler_weather()
 
     # Validate the structure and content of the result
     assert "alpineForecast" in result_data
