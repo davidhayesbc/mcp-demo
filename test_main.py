@@ -6,7 +6,7 @@ from main import whistler_weather
 async def test_whistler_weather(monkeypatch):
     # Mock the fetch_weather_data function
     async def mock_fetch_weather_data(url):
-        with open("weather.html", "r") as file:
+        with open("test-data\weather.html", "r") as file:
             return file.read()
 
     monkeypatch.setattr("main.fetch_weather_data", mock_fetch_weather_data)
