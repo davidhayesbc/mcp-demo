@@ -5,6 +5,7 @@ from mcp.server.fastmcp import FastMCP
 import re
 import json
 from bs4 import BeautifulSoup
+from datetime import date, datetime
 
 # Configure logging
 logging.basicConfig(
@@ -52,7 +53,7 @@ async def fetch_weather_data(url: str) -> str:
         logging.error(f"An unexpected error occurred: {e}")
         raise
 
-#@mcp.resource("data://weather")
+@mcp.resource("data://weather")
 @mcp.tool("weather")
 async def whistler_weather() -> dict:
     """Returns weather data for Whistler Blackcomb."""
@@ -86,7 +87,7 @@ async def whistler_weather() -> dict:
                                 "FreezingLevelMetric": forecast.get("FreezingLevelMetric"),
                                 "SnowFallDayMetric": forecast.get("SnowFallDayMetric"),
                                 "SnowFallNightMetric": forecast.get("SnowFallNightMetric"),
-                                "Date": forecast.get("Date").split('T')[0] if forecast.get("Date") else None,
+                                "Date": datetime.fromisoformat(forecast.get("Date")).date() if forecast.get("Date") else None,
                                 "WeatherShortDescription": forecast.get("WeatherShortDescription"),
                             }
                             if "ForecastData" in forecast:
@@ -98,7 +99,7 @@ async def whistler_weather() -> dict:
                                         "FreezingLevelMetric": day.get("FreezingLevelMetric"),
                                         "SnowFallDayMetric": day.get("SnowFallDayMetric"),
                                         "SnowFallNightMetric": day.get("SnowFallNightMetric"),
-                                        "Date": day.get("Date").split('T')[0] if day.get("Date") else None,
+                                        "Date": datetime.fromisoformat(day.get("Date")).date() if day.get("Date") else None,
                                         "WeatherShortDescription": day.get("WeatherShortDescription"),
                                     }
                                     for day in forecast["ForecastData"]
@@ -126,3 +127,8 @@ async def whistler_weather() -> dict:
 def get_app_version() -> str:
     """Returns the application version."""
     return "v0.0.1"
+
+@mcp.resource("data://product-categories")
+def get_categories() -> list[str]:
+    """Returns a list of available product categories."""
+    return ["Electronics", "Books", "Home Goods"]
