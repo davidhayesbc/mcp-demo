@@ -13,7 +13,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
-mcp = FastMCP("Whistler Weather)")
+mcp = FastMCP("Whistler Weather")
 
 if __name__ == "__main__":
     mcp.run() # Assuming 'mcp' is your FastMCP instance
@@ -86,7 +86,7 @@ async def whistler_weather() -> dict:
                                 "FreezingLevelMetric": forecast.get("FreezingLevelMetric"),
                                 "SnowFallDayMetric": forecast.get("SnowFallDayMetric"),
                                 "SnowFallNightMetric": forecast.get("SnowFallNightMetric"),
-                                "Date": forecast.get("Date"),
+                                "Date": forecast.get("Date").split('T')[0] if forecast.get("Date") else None,
                                 "WeatherShortDescription": forecast.get("WeatherShortDescription"),
                             }
                             if "ForecastData" in forecast:
@@ -98,7 +98,7 @@ async def whistler_weather() -> dict:
                                         "FreezingLevelMetric": day.get("FreezingLevelMetric"),
                                         "SnowFallDayMetric": day.get("SnowFallDayMetric"),
                                         "SnowFallNightMetric": day.get("SnowFallNightMetric"),
-                                        "Date": day.get("Date"),
+                                        "Date": day.get("Date").split('T')[0] if day.get("Date") else None,
                                         "WeatherShortDescription": day.get("WeatherShortDescription"),
                                     }
                                     for day in forecast["ForecastData"]
