@@ -126,8 +126,3 @@ async def whistler_weather() -> dict:
 def get_app_version() -> str:
     """Returns the application version."""
     return "v0.0.1"
-
-@mcp.resource("data://product-categories")
-def get_categories() -> list[str]:
-    """Returns a list of available product categories."""
-    return ["Electronics", "Books", "Home Goods"]
