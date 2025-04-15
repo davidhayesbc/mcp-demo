@@ -16,7 +16,7 @@ logging.basicConfig(
 mcp = FastMCP("Whistler Weather)")
 
 WHISTLER_WEATHER_API_URL = "https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"
-USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0"
 
 async def fetch_weather_data(url: str) -> str:
     headers = {
@@ -100,8 +100,10 @@ async def whistler_weather() -> dict:
                         logging.error("Could not parse forecast JSON data.")
                         weather_data["forecast_parse_error"] = "Could not parse forecast JSON data"
                         break  # Exit loop if parsing fails
-        
-        return weather_data  # Return the dictionary directly
+        logging.info("Weather data fetched and parsed successfully.")
+        # Log the contents of weather_data
+        logging.info(f"Weather data contents: {json.dumps(weather_data, indent=2, default=str)}")
+        return weather_data
     except Exception as e:
         logging.error(f"Failed to fetch weather data: {str(e)}")
         return {"error": f"Failed to fetch weather data: {str(e)}"}
