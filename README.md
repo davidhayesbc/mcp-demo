@@ -7,3 +7,4 @@ Clone the Repo
 cd mcp-demo
  code .
 
+Change the path in .vscode\mcp.json
