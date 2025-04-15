@@ -1,12 +1,9 @@
 {
-    "servers": {
-        "my-whistler-weather": {
-            "type": "stdio",
-            "command": "fastmcp",
-            "args": [
-                "run",
-                "Z:\\mcp-demo\\main.py"
-            ]
-        }
+  "servers": {
+    "my-whistler-weather": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": ["-NoProfile", "e:\\source\\mcp-demo\\runServer.ps1"]
     }
+  }
 }
