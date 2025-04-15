@@ -15,6 +15,9 @@ logging.basicConfig(
 
 mcp = FastMCP("Whistler Weather)")
 
+if __name__ == "__main__":
+    mcp.run() # Assuming 'mcp' is your FastMCP instance
+
 WHISTLER_WEATHER_API_URL = "https://www.whistlerblackcomb.com/the-mountain/mountain-conditions/snow-and-weather-report.aspx"
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0"
 
@@ -49,7 +52,8 @@ async def fetch_weather_data(url: str) -> str:
         logging.error(f"An unexpected error occurred: {e}")
         raise
 
-@mcp.resource("data://weather")
+#@mcp.resource("data://weather")
+@mcp.tool("weather")
 async def whistler_weather() -> dict:
     """Returns weather data for Whistler Blackcomb."""
     try:
