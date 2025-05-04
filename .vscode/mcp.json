@@ -3,7 +3,12 @@
     "my-whistler-weather": {
       "type": "stdio",
       "command": "powershell",
-      "args": ["-NoProfile", "e:\\source\\mcp-demo\\runServer.ps1"]
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "d:\\source\\mcp-demo\\python\\runServer.ps1"
+      ]
     }
   }
 }
