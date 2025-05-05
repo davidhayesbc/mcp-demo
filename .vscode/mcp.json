@@ -9,6 +9,15 @@
         "Bypass",
         "d:\\source\\mcp-demo\\python\\runServer.ps1"
       ]
+    },
+    "my-EchoMCP": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "D:\\source\\mcp-demo\\csharp\\mcp-demo.csproj"
+      ]
     }
   }
 }
