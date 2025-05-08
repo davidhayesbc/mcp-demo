@@ -8,9 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BrowseSharp" Version="0.1.2-alpha" />
+    <PackageReference Include="BrowseSharp.Common" Version="0.1.2-alpha" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-preview.3.25171.5" />
-    <PackageReference Include="ModelContextProtocol" Version="0.1.0-preview.11" />
+    <PackageReference Include="Microsoft.Playwright" Version="1.52.0" />
+    <PackageReference Include="ModelContextProtocol" Version="0.1.0-preview.12" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 

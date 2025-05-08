@@ -1,6 +1,6 @@
 {
   "servers": {
-    "my-whistler-weather": {
+    "my-whistler-weather-python": {
       "type": "stdio",
       "command": "powershell",
       "args": [
@@ -10,13 +10,13 @@
         "d:\\source\\mcp-demo\\python\\runServer.ps1"
       ]
     },
-    "my-EchoMCP": {
+    "my-Whistler-Weather-C#": {
       "type": "stdio",
       "command": "dotnet",
       "args": [
         "run",
         "--project",
-        "D:\\source\\mcp-demo\\csharp\\mcp-demo.csproj"
+        "D:\\source\\mcp-demo\\csharp\\mcp-demo\\mcp-demo.csproj"
       ]
     }
   }
